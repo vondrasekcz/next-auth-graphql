@@ -1,0 +1,4 @@
+basic setup
+  https://benjaminwfox.medium.com/next-js-setup-config-for-testing-linting-and-absolute-imports-605959d7bd6f
+    - eslint
+    - jest
