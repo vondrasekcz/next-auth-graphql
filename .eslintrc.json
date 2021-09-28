@@ -1,3 +1,6 @@
 {
-  "extends": "next/core-web-vitals"
+  "extends": "next/core-web-vitals",
+  "rules": {
+    "@next/next/no-document-import-in-page": "warn" // TODO doesn't work => update next to 11.1.3
+  }
 }
