@@ -1,12 +1,12 @@
 import { getLayout, } from '@/components/Layout';
 
 
-const HomePage = (): JSX.Element => {
+const PublicPage = (): JSX.Element => {
   return (
     <div>
 
       <h1>
-        Index Page
+        Public Page
       </h1>
 
     </div>
@@ -14,7 +14,7 @@ const HomePage = (): JSX.Element => {
 };
 
 
-HomePage.getLayout = getLayout;
+PublicPage.getLayout = getLayout;
 
 
-export default HomePage;
+export default PublicPage;
