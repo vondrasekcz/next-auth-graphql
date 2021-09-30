@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { ComponentClass, FunctionComponent, } from 'react';
 import { NextPage, NextPageContext, } from 'next';
 import App, { AppContext, } from 'next/app';
@@ -66,6 +67,7 @@ export const withApollo = <P, IP>(
 
       // Run all GraphQL queries in the component tree
       // and extract the resulting data
+      // TODO - in page context -> initOnContext
       const apolloClient = (ctx.ctx.apolloClient = initApolloClient({}));
 
 
@@ -137,3 +139,8 @@ export const withApollo = <P, IP>(
 
   return WithApollo;
 };
+
+
+// resources:
+// https://github.com/benawad/jwt-auth-example/blob/nextjs-starter-code/web-nextjs/lib/apollo.tsx
+// https://github.com/adamsoffer/next-apollo/blob/master/src/withApollo.tsx
