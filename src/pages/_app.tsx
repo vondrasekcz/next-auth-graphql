@@ -1,6 +1,7 @@
 import type { AppProps, } from 'next/app';
 
 import type { GetLayout, } from '@/types/common';
+import { withApollo, } from '@/apollo/withApollo';
 
 
 interface Props extends Omit<AppProps, 'Component'> {
@@ -19,4 +20,4 @@ const MyApp = ({
 };
 
 
-export default MyApp;
+export default withApollo(MyApp);
