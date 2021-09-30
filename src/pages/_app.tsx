@@ -1,12 +1,10 @@
-import { NextComponentType, NextPageContext, } from 'next';
 import type { AppProps, } from 'next/app';
 
 import type { GetLayout, } from '@/types/common';
 
 
-interface Props<P = Record<string, unknown>> extends Omit<AppProps, 'Component'> {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  Component: NextComponentType<NextPageContext, any, P> & { getLayout?: GetLayout },
+interface Props extends Omit<AppProps, 'Component'> {
+  Component: AppProps['Component'] & { getLayout?: GetLayout },
 }
 
 
