@@ -1,29 +1,37 @@
-import { NextPage, NextPageContext } from 'next';
-import App, { AppContext } from 'next/app';
-import Head from 'next/head';
+import { ComponentClass, FunctionComponent, } from 'react';
+import { NextPage, NextPageContext, } from 'next';
+import App, { AppContext, } from 'next/app';
 import {
   ApolloClient,
   ApolloProvider,
-  NormalizedCacheObject
+  NormalizedCacheObject,
 } from '@apollo/client';
 
 import { initApolloClient, } from './initApolloClient';
 import { isProduction, isServer, } from '@/utils/common';
 
 
-// TODO types
+type WithApolloOptions = {
+  apolloClient: ApolloClient<NormalizedCacheObject>;
+  apolloState: NormalizedCacheObject;
+};
+
+type ContextWithApolloOptions =
+  AppContext
+  & { ctx: { apolloClient: WithApolloOptions['apolloClient'] }, }
+  & NextPageContext
+  & WithApolloOptions;
+
+
 export const withApollo = <P, IP>(
   PageComponent: NextPage<P, IP>,
-  { ssr = true } = {},
-) => {
-  console.log('-------------------------------------------------------')
-
-
+  { ssr = true, } = {},
+): ComponentClass<P> | FunctionComponent<P> => {
   const WithApollo = ({
     apolloClient,
     apolloState,
     ...pageProps
-  }: any) => {
+  }: any): JSX.Element => {
     const client = apolloClient || initApolloClient(apolloState);
     return (
       <ApolloProvider client={client}>
@@ -33,22 +41,27 @@ export const withApollo = <P, IP>(
   };
 
 
-  // Set the correct displayName in development
   if (!isProduction()) {
+    // to enable Automatic Static Optimization move withApollo to Next Pages
+    // modify withApollo: https://github.com/adamsoffer/next-apollo/blob/master/src/withApollo.tsx
+    console.warn(
+      'Warning: You have opted-out of Automatic Static Optimization due to `withApollo` in `pages/_app`.'
+      + 'Read more: https://err.sh/next.js/opt-out-auto-static-optimization'
+    );
+
+    // Set the correct displayName in development
     const displayName = PageComponent.displayName || PageComponent.name || 'Component';
     WithApollo.displayName = `withApollo(${displayName})`;
   }
 
 
   if (ssr || PageComponent.getInitialProps) {
-    WithApollo.getInitialProps = async (ctx: any) => {
+    WithApollo.getInitialProps = async (ctx: ContextWithApolloOptions) => {
       const inAppContext = Boolean(ctx.ctx);
-      console.log('inAppContext', inAppContext)
-      console.log('ctx', ctx);
 
       const {
         AppTree,
-        ctx: { res, },
+        ctx: { res, } = {},
       } = ctx;
 
       // Run all GraphQL queries in the component tree
@@ -84,9 +97,9 @@ export const withApollo = <P, IP>(
             // we need to modify their props a little.
             let props;
             if (inAppContext) {
-              props = { ...pageProps, apolloClient };
+              props = { ...pageProps, apolloClient, };
             } else {
-              props = { pageProps: { ...pageProps, apolloClient } };
+              props = { pageProps: { ...pageProps, apolloClient, }, };
             }
 
             // Take the Next.js AppTree, determine which queries are needed to render,
@@ -94,7 +107,8 @@ export const withApollo = <P, IP>(
             // your entire AppTree once for every query. Check out apollo fragments
             // if you want to reduce the number of rerenders.
             // https://www.apollographql.com/docs/react/data/fragments/
-            await getDataFromTree(<AppTree {...props} />);
+
+            await getDataFromTree(<AppTree {...props as any} />);
           } catch (error) {
             // Prevent Apollo Client GraphQL errors from crashing SSR.
             // Handle them in components via the data.error prop:
