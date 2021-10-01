@@ -43,8 +43,7 @@ export const withApollo = <P, IP>(
 
 
   if (!isProduction()) {
-    // to enable Automatic Static Optimization move withApollo to Next Pages
-    // modify withApollo: https://github.com/adamsoffer/next-apollo/blob/master/src/withApollo.tsx
+    // to enable Automatic Static Optimization move withApollo to Next Pages modify withApollo
     console.warn(
       'Warning: You have opted-out of Automatic Static Optimization due to `withApollo` in `pages/_app`.'
       + 'Read more: https://err.sh/next.js/opt-out-auto-static-optimization'
@@ -139,8 +138,3 @@ export const withApollo = <P, IP>(
 
   return WithApollo;
 };
-
-
-// resources:
-// https://github.com/benawad/jwt-auth-example/blob/nextjs-starter-code/web-nextjs/lib/apollo.tsx
-// https://github.com/adamsoffer/next-apollo/blob/master/src/withApollo.tsx
