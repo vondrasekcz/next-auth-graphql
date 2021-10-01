@@ -2,3 +2,9 @@ basic setup
   https://benjaminwfox.medium.com/next-js-setup-config-for-testing-linting-and-absolute-imports-605959d7bd6f
     - eslint
     - jest
+
+
+apollo next
+  https://github.com/benawad/jwt-auth-example/blob/nextjs-starter-code/web-nextjs/lib/apollo.tsx
+  https://github.com/adamsoffer/next-apollo/blob/master/src/withApollo.tsx
+  https://www.apollographql.com/docs/react/performance/server-side-rendering/

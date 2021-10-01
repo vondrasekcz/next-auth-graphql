@@ -1,0 +1,6 @@
+query DialTypes {
+  dialTypes {
+    key
+    value
+  }
+}
