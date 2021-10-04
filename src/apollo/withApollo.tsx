@@ -24,6 +24,10 @@ type ContextWithApolloOptions =
   & WithApolloOptions;
 
 
+/**
+ * IMPORTANT: No support Next Page with withApollo
+ */
+
 export const withApollo = <P, IP>(
   PageComponent: NextPage<P, IP>,
   { ssr = true, } = {},
@@ -43,7 +47,6 @@ export const withApollo = <P, IP>(
 
 
   if (!isProduction()) {
-    // to enable Automatic Static Optimization move withApollo to Next Pages modify withApollo
     console.warn(
       'Warning: You have opted-out of Automatic Static Optimization due to `withApollo` in `pages/_app`.'
       + 'Read more: https://err.sh/next.js/opt-out-auto-static-optimization'
