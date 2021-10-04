@@ -1,11 +1,12 @@
 import Link from 'next/link';
 
+import { useAuthUser, } from '@/libs/auth/hooks/useAuthUser';
 import LoginForm from './LoginForm';
 import UserPanel from './UserPanel';
 
 
 const Header = (): JSX.Element => {
-  const isLogged = false;
+  const authUser = useAuthUser();
 
 
   return (
@@ -30,10 +31,10 @@ const Header = (): JSX.Element => {
       </ul>
 
       <div>
-        {isLogged ? (
-          <LoginForm />
-        ) : (
+        {authUser ? (
           <UserPanel />
+        ) : (
+          <LoginForm />
         )}
       </div>
 

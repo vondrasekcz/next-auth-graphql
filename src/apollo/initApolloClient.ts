@@ -2,19 +2,43 @@ import {
   ApolloClient,
   HttpLink,
   InMemoryCache,
+  ApolloLink,
   NormalizedCacheObject,
+  from,
 } from '@apollo/client';
+
 import { isServer, } from '@/utils/common';
+import { getAccessToken, } from '@/libs/accessTokenStore';
+import { createRefreshLink, } from './createRefreshLink';
 
 
 let globalApolloClient: ApolloClient<NormalizedCacheObject> | null = null;
 
 
 const createApolloClient = (initialState: NormalizedCacheObject = {}): ApolloClient<NormalizedCacheObject> => {
-  const link = new HttpLink({
+  const httpTerminatingLink = new HttpLink({
     uri: process.env.NEXT_PUBLIC_HTTP_LINK,
     credentials: 'include',
   });
+
+  const httpAuthLink = new ApolloLink((operation, forward) => {
+    const accessToken = getAccessToken();
+    operation.setContext(({ headers = {}, }) => ({
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        ...headers,
+      },
+    }));
+    return forward(operation);
+  });
+
+  const refreshLink = createRefreshLink();
+
+  const link = from([
+    refreshLink,
+    httpAuthLink,
+    httpTerminatingLink,
+  ]);
 
   const apolloClient = new ApolloClient({
     ssrMode: isServer(), // Disables forceFetch on the server (so queries are only run once)

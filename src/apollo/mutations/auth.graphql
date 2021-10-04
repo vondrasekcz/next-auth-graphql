@@ -1,0 +1,48 @@
+mutation Login (
+  $loginInput: LoginInput!
+) {
+  login(
+    loginInput: $loginInput
+  ) {
+    id
+    email
+    token {
+      ...Token
+    }
+  }
+}
+
+mutation RefreshToken {
+  refreshToken {
+    ...Token
+  }
+}
+
+mutation Logout { logout }
+
+mutation PasswordRecoveryStepOne (
+  $email: String!
+  $countryCode: countryCodeEnum!
+) {
+  passwordRecoveryStepOne (
+    email: $email
+    countryCode: $countryCode
+  )
+}
+
+mutation PasswordRecoveryStepThree (
+  $hash: String!
+  $password: String!
+) {
+  passwordRecoveryStepThree (
+    hash: $hash
+    password: $password
+  ) {
+    id
+    email
+    token {
+      accessToken
+      refreshToken
+    }
+  }
+}
