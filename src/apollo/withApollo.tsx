@@ -2,19 +2,24 @@
 import { ComponentClass, FunctionComponent, } from 'react';
 import { NextPage, NextPageContext, } from 'next';
 import App, { AppContext, } from 'next/app';
+import cookie from 'cookie';
+
 import {
   ApolloClient,
   ApolloProvider,
   NormalizedCacheObject,
 } from '@apollo/client';
-
-import { initApolloClient, } from './initApolloClient';
 import { isProduction, isServer, } from '@/utils/common';
+import { initApolloClient, } from './initApolloClient';
+import { fetchMutationRefresh, } from './createRefreshLink';
+import { getAccessToken, setAccessToken, } from '@/libs/accessTokenStore';
+import { CurrentUserDocument } from './graphql';
 
 
 type WithApolloOptions = {
   apolloClient: ApolloClient<NormalizedCacheObject>;
   apolloState: NormalizedCacheObject;
+  serverAccessToken?: string | null,
 };
 
 type ContextWithApolloOptions =
@@ -35,8 +40,12 @@ export const withApollo = <P, IP>(
   const WithApollo = ({
     apolloClient,
     apolloState,
+    serverAccessToken,
     ...pageProps
   }: any): JSX.Element => {
+    if (!isServer() && !getAccessToken) {
+      setAccessToken(serverAccessToken);
+    }
     const client = apolloClient || initApolloClient(apolloState);
     return (
       <ApolloProvider client={client}>
@@ -61,16 +70,39 @@ export const withApollo = <P, IP>(
   if (ssr || PageComponent.getInitialProps) {
     WithApollo.getInitialProps = async (ctx: ContextWithApolloOptions) => {
       const inAppContext = Boolean(ctx.ctx);
+      let serverAccessToken: null | string = null;
 
       const {
         AppTree,
-        ctx: { res, } = {},
+        ctx: { req, res, } = {},
       } = ctx;
+
+
+      console.log('----------------------------------------------')
+
+      if (isServer()) {
+        const cookies = cookie.parse(req?.headers.cookie || '');
+        if (cookies.refreshToken) {
+          console.log('process.env.NEXT_PUBLIC_HTTP_LINK', process.env.NEXT_PUBLIC_HTTP_LINK)
+          console.log('cookies.refreshToken', cookies.refreshToken);
+
+          const response = await fetchMutationRefresh({
+            headers: {
+              cookie: `refreshToken=${cookies.refreshToken}`,
+            },
+          });
+
+          // TODO check this await
+          const response2 = await response.json();
+          console.log('response', response2);
+          serverAccessToken = response2?.data?.refreshToken?.accessToken as string | null;
+        }
+      }
 
       // Run all GraphQL queries in the component tree
       // and extract the resulting data
       // TODO - in page context -> initOnContext
-      const apolloClient = (ctx.ctx.apolloClient = initApolloClient({}));
+      const apolloClient = (ctx.ctx.apolloClient = initApolloClient({}, serverAccessToken));
 
 
       // Run wrapped getInitialProps methods
@@ -89,6 +121,19 @@ export const withApollo = <P, IP>(
         if (res?.writableEnded) {
           return pageProps;
         }
+
+        // TODO - catch -> when it fail, remove accessToken and redirect to some public page
+        // TODO - fetch it normally with accessToken
+        try {
+          if (serverAccessToken) {
+            await apolloClient.query({
+              query: CurrentUserDocument,
+            });
+          }
+        } catch (error) {
+          // ignore error
+        }
+
 
         if (ssr && AppTree) {
           // Run all GraphQL queries
@@ -135,6 +180,8 @@ export const withApollo = <P, IP>(
         // Provide the client for ssr. As soon as this payload
         // gets JSON.stringified it will remove itself.
         apolloClient: ctx.apolloClient,
+        // server fetched accessToken
+        serverAccessToken,
       };
     };
   }

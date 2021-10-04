@@ -4,7 +4,6 @@ import { useDialTypesQuery, } from '@/apollo/graphql';
 
 const HomePage = (): JSX.Element => {
   const { loading, error, data, } = useDialTypesQuery();
-  console.log('useDialTypesQuery', loading, error, data);
 
   return (
     <div>

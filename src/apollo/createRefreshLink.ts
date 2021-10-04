@@ -5,9 +5,18 @@ import { getAccessToken, setAccessToken, } from '@/libs/accessTokenStore';
 import { TokenFragment, } from './graphql';
 
 
-const fetchRefresh = (): Promise<Response> => fetch(process.env.REACT_APP_HTTP_LINK as string, {
+type FetchMutationRefreshArgs = {
+  headers?: { [key: string]: string }
+};
+
+export const fetchMutationRefresh = ({
+  headers,
+}: FetchMutationRefreshArgs = {}): Promise<Response> => fetch(process.env.NEXT_PUBLIC_HTTP_LINK as string, {
   method: 'POST',
-  headers: { 'Content-Type': 'application/json', },
+  headers: {
+    'Content-Type': 'application/json',
+    ...headers,
+  },
   credentials: 'include',
   body: JSON.stringify({
     query: `mutation RefreshToken {
@@ -58,7 +67,7 @@ const handleRefreshError = (error: unknown) => {
 export const createRefreshLink = (): TokenRefreshLink<TokenFragment> => new TokenRefreshLink<TokenFragment>({
   accessTokenField: 'refresh',
   isTokenValidOrUndefined: isAccessTokenValidOrUndefined,
-  fetchAccessToken: fetchRefresh,
+  fetchAccessToken: fetchMutationRefresh,
   handleFetch: handleRefreshCompleted,
   handleError: handleRefreshError,
 });

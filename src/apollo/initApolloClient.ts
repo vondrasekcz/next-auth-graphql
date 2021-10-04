@@ -15,17 +15,20 @@ import { createRefreshLink, } from './createRefreshLink';
 let globalApolloClient: ApolloClient<NormalizedCacheObject> | null = null;
 
 
-const createApolloClient = (initialState: NormalizedCacheObject = {}): ApolloClient<NormalizedCacheObject> => {
+const createApolloClient = (
+  initialState: NormalizedCacheObject = {},
+  serverAccessToken?: string | null,
+): ApolloClient<NormalizedCacheObject> => {
   const httpTerminatingLink = new HttpLink({
     uri: process.env.NEXT_PUBLIC_HTTP_LINK,
     credentials: 'include',
   });
 
   const httpAuthLink = new ApolloLink((operation, forward) => {
-    const accessToken = getAccessToken();
+    const accessToken = isServer() ? serverAccessToken : getAccessToken();
     operation.setContext(({ headers = {}, }) => ({
       headers: {
-        Authorization: `Bearer ${accessToken}`,
+        Authorization: `Bearer ${accessToken || ''}`,
         ...headers,
       },
     }));
@@ -55,11 +58,11 @@ const createApolloClient = (initialState: NormalizedCacheObject = {}): ApolloCli
 };
 
 
-export const initApolloClient = (initState?: NormalizedCacheObject): ApolloClient<NormalizedCacheObject> => {
+export const initApolloClient = (initState?: NormalizedCacheObject, serverAccessToken?: string | null): ApolloClient<NormalizedCacheObject> => {
   // Make sure to create a new client for every server-side request so that data
   // isn't shared between connections (which would be bad)
   if (isServer()) {
-    return createApolloClient(initState);
+    return createApolloClient(initState, serverAccessToken);
   }
 
   // Reuse client on the client-side
