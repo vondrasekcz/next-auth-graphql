@@ -81,6 +81,7 @@ export const withApollo = <P, IP>(
       console.log('----------------------------------------------')
 
       if (isServer()) {
+        // TODO - try catch
         const cookies = cookie.parse(req?.headers.cookie || '');
         if (cookies.refreshToken) {
           console.log('process.env.NEXT_PUBLIC_HTTP_LINK', process.env.NEXT_PUBLIC_HTTP_LINK)
