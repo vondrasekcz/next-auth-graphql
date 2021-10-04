@@ -1,7 +1,15 @@
+import { AuthUserFragment, } from '@/apollo/graphql';
 import { useLogout, } from '@/libs/auth/hooks/useLogout';
 
 
-const UserPanel = (): JSX.Element => {
+interface Props {
+  authUser: AuthUserFragment
+}
+
+
+const UserPanel = ({
+  authUser,
+}: Props): JSX.Element => {
   const [ logoutMutation, logoutMutationData, ] = useLogout();
 
   const handleLogout = () => logoutMutation();
@@ -10,7 +18,7 @@ const UserPanel = (): JSX.Element => {
   return (
     <div>
       <div>
-        username
+        {authUser.email}
       </div>
       <div>
         <button

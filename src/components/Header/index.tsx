@@ -32,7 +32,7 @@ const Header = (): JSX.Element => {
 
       <div>
         {authUser ? (
-          <UserPanel />
+          <UserPanel authUser={authUser} />
         ) : (
           <LoginForm />
         )}
