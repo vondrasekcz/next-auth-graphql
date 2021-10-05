@@ -5,17 +5,10 @@ import { getAccessToken, setAccessToken, } from '@/libs/accessTokenStore';
 import { TokenFragment, } from './graphql';
 
 
-type FetchMutationRefreshArgs = {
-  headers?: { [key: string]: string }
-};
-
-export const fetchMutationRefresh = ({
-  headers,
-}: FetchMutationRefreshArgs = {}): Promise<Response> => fetch(process.env.NEXT_PUBLIC_HTTP_LINK as string, {
+const fetchMutationRefresh = (): Promise<Response> => fetch(process.env.NEXT_PUBLIC_HTTP_LINK as string, {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
-    ...headers,
   },
   credentials: 'include',
   body: JSON.stringify({

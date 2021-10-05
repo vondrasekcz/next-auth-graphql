@@ -9,11 +9,17 @@ import {
   ApolloProvider,
   NormalizedCacheObject,
 } from '@apollo/client';
+import {
+  CurrentUserDocument,
+  CurrentUserQuery,
+  CurrentUserQueryVariables,
+  RefreshTokenDocument,
+  RefreshTokenMutation,
+  RefreshTokenMutationVariables,
+} from './graphql';
 import { isProduction, isServer, } from '@/utils/common';
 import { initApolloClient, } from './initApolloClient';
-import { fetchMutationRefresh, } from './createRefreshLink';
 import { getAccessToken, setAccessToken, } from '@/libs/accessTokenStore';
-import { CurrentUserDocument } from './graphql';
 
 
 type WithApolloOptions = {
@@ -60,8 +66,6 @@ export const withApollo = <P, IP>(
       'Warning: You have opted-out of Automatic Static Optimization due to `withApollo` in `pages/_app`.'
       + 'Read more: https://err.sh/next.js/opt-out-auto-static-optimization'
     );
-
-    // Set the correct displayName in development
     const displayName = PageComponent.displayName || PageComponent.name || 'Component';
     WithApollo.displayName = `withApollo(${displayName})`;
   }
@@ -70,7 +74,7 @@ export const withApollo = <P, IP>(
   if (ssr || PageComponent.getInitialProps) {
     WithApollo.getInitialProps = async (ctx: ContextWithApolloOptions) => {
       const inAppContext = Boolean(ctx.ctx);
-      let serverAccessToken: null | string = null;
+      let serverAccessToken: string | null = null;
 
       const {
         AppTree,
@@ -78,32 +82,52 @@ export const withApollo = <P, IP>(
       } = ctx;
 
 
-      console.log('----------------------------------------------')
+      // TODO - in page context -> initOnContext
+      let apolloClient = initApolloClient({});
 
       if (isServer()) {
-        // TODO - try catch
-        const cookies = cookie.parse(req?.headers.cookie || '');
-        if (cookies.refreshToken) {
-          console.log('process.env.NEXT_PUBLIC_HTTP_LINK', process.env.NEXT_PUBLIC_HTTP_LINK)
-          console.log('cookies.refreshToken', cookies.refreshToken);
+        // 1. check cookies
+        // 2. refresh token
+        // 3. get current user
+        // 4. create ApolloClient with new accessToken
+        try {
+          const cookies = cookie.parse(req?.headers.cookie || '');
 
-          const response = await fetchMutationRefresh({
-            headers: {
-              cookie: `refreshToken=${cookies.refreshToken}`,
-            },
-          });
+          if (cookies.refreshToken) {
+            const responseRefreshToken = await apolloClient.mutate<RefreshTokenMutation, RefreshTokenMutationVariables>({
+              mutation: RefreshTokenDocument,
+              fetchPolicy: 'no-cache',
+              context: {
+                headers: {
+                  cookie: `refreshToken=${cookies.refreshToken}`,
+                },
+              },
+            });
 
-          // TODO check this await
-          const response2 = await response.json();
-          console.log('response', response2);
-          serverAccessToken = response2?.data?.refreshToken?.accessToken as string | null;
+            const newAccessToken = responseRefreshToken.data?.refreshToken.accessToken;
+            if (!newAccessToken) throw new Error('withApollo - no AccessToken');
+
+            const responseCurrentUser = await apolloClient.query<CurrentUserQuery, CurrentUserQueryVariables>({
+              query: CurrentUserDocument,
+              context: {
+                headers: {
+                  Authorization: `Bearer ${newAccessToken || ''}`,
+                },
+              },
+            });
+
+            if (!responseCurrentUser.data.currentUser) throw new Error('withApollo - no Current user');
+
+            serverAccessToken = newAccessToken;
+            apolloClient = initApolloClient(apolloClient.cache.extract(), newAccessToken);
+          }
+        } catch (error) {
+          // ignore error
         }
       }
 
-      // Run all GraphQL queries in the component tree
-      // and extract the resulting data
-      // TODO - in page context -> initOnContext
-      const apolloClient = (ctx.ctx.apolloClient = initApolloClient({}, serverAccessToken));
+      // set upt context apolloClient
+      ctx.ctx.apolloClient = apolloClient;
 
 
       // Run wrapped getInitialProps methods
@@ -123,19 +147,9 @@ export const withApollo = <P, IP>(
           return pageProps;
         }
 
-        // TODO - catch -> when it fail, remove accessToken and redirect to some public page
-        // TODO - fetch it normally with accessToken
-        try {
-          if (serverAccessToken) {
-            await apolloClient.query({
-              query: CurrentUserDocument,
-            });
-          }
-        } catch (error) {
-          // ignore error
-        }
 
-
+        // Run all GraphQL queries in the component tree
+        // and extract the resulting data
         if (ssr && AppTree) {
           // Run all GraphQL queries
           try {
