@@ -81,6 +81,9 @@ export const withApollo = <P, IP>(
         ctx: { req, res, } = {},
       } = ctx;
 
+      // 1. create apollo client
+      // 2. authenticate
+      // 3. add apollo client to context
 
       // TODO - in page context -> initOnContext
       let apolloClient = initApolloClient({});
@@ -138,15 +141,12 @@ export const withApollo = <P, IP>(
         pageProps = await App.getInitialProps(ctx);
       }
 
-
-      // Only on the server
       if (isServer()) {
         // When redirecting, the response is finished.
         // No point in continuing to render
         if (res?.writableEnded) {
           return pageProps;
         }
-
 
         // Run all GraphQL queries in the component tree
         // and extract the resulting data
