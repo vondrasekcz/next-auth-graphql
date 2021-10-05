@@ -1551,12 +1551,310 @@ export enum UpholsteryEnum {
   UpholsteryVelour = 'UPHOLSTERY_VELOUR'
 }
 
+export type TokenFragment = { __typename?: 'Token', accessToken: string };
+
+export type AuthUserFragment = { __typename?: 'User', id: string, email: string, active: boolean, admin?: Maybe<boolean> };
+
+export type LoginMutationVariables = Exact<{
+  loginInput: LoginInput;
+}>;
+
+
+export type LoginMutation = { __typename?: 'Mutation', login: { __typename?: 'AuthPayload', id: string, email: string, token: { __typename?: 'Token', accessToken: string } } };
+
+export type RefreshTokenMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type RefreshTokenMutation = { __typename?: 'Mutation', refreshToken: { __typename?: 'Token', accessToken: string } };
+
+export type LogoutMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type LogoutMutation = { __typename?: 'Mutation', logout: boolean };
+
+export type PasswordRecoveryStepOneMutationVariables = Exact<{
+  email: Scalars['String'];
+  countryCode: CountryCodeEnum;
+}>;
+
+
+export type PasswordRecoveryStepOneMutation = { __typename?: 'Mutation', passwordRecoveryStepOne: boolean };
+
+export type PasswordRecoveryStepThreeMutationVariables = Exact<{
+  hash: Scalars['String'];
+  password: Scalars['String'];
+}>;
+
+
+export type PasswordRecoveryStepThreeMutation = { __typename?: 'Mutation', passwordRecoveryStepThree: { __typename?: 'AuthPayload', id: string, email: string, token: { __typename?: 'Token', accessToken: string, refreshToken: string } } };
+
+export type CurrentUserQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type CurrentUserQuery = { __typename?: 'Query', currentUser: { __typename?: 'User', id: string, email: string, active: boolean, admin?: Maybe<boolean> } };
+
+export type PasswordRecoveryStepTwoQueryVariables = Exact<{
+  hash: Scalars['String'];
+}>;
+
+
+export type PasswordRecoveryStepTwoQuery = { __typename?: 'Query', passwordRecoveryStepTwo: boolean };
+
 export type DialTypesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type DialTypesQuery = { __typename?: 'Query', dialTypes: Array<{ __typename?: 'DialTypeItem', key: string, value: string }> };
 
+export const TokenFragmentDoc = gql`
+    fragment Token on Token {
+  accessToken
+}
+    `;
+export const AuthUserFragmentDoc = gql`
+    fragment AuthUser on User {
+  id
+  email
+  active
+  admin
+}
+    `;
+export const LoginDocument = gql`
+    mutation Login($loginInput: LoginInput!) {
+  login(loginInput: $loginInput) {
+    id
+    email
+    token {
+      ...Token
+    }
+  }
+}
+    ${TokenFragmentDoc}`;
+export type LoginMutationFn = Apollo.MutationFunction<LoginMutation, LoginMutationVariables>;
 
+/**
+ * __useLoginMutation__
+ *
+ * To run a mutation, you first call `useLoginMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useLoginMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [loginMutation, { data, loading, error }] = useLoginMutation({
+ *   variables: {
+ *      loginInput: // value for 'loginInput'
+ *   },
+ * });
+ */
+export function useLoginMutation(baseOptions?: Apollo.MutationHookOptions<LoginMutation, LoginMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<LoginMutation, LoginMutationVariables>(LoginDocument, options);
+      }
+export type LoginMutationHookResult = ReturnType<typeof useLoginMutation>;
+export type LoginMutationResult = Apollo.MutationResult<LoginMutation>;
+export type LoginMutationOptions = Apollo.BaseMutationOptions<LoginMutation, LoginMutationVariables>;
+export const RefreshTokenDocument = gql`
+    mutation RefreshToken {
+  refreshToken {
+    ...Token
+  }
+}
+    ${TokenFragmentDoc}`;
+export type RefreshTokenMutationFn = Apollo.MutationFunction<RefreshTokenMutation, RefreshTokenMutationVariables>;
+
+/**
+ * __useRefreshTokenMutation__
+ *
+ * To run a mutation, you first call `useRefreshTokenMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRefreshTokenMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [refreshTokenMutation, { data, loading, error }] = useRefreshTokenMutation({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useRefreshTokenMutation(baseOptions?: Apollo.MutationHookOptions<RefreshTokenMutation, RefreshTokenMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<RefreshTokenMutation, RefreshTokenMutationVariables>(RefreshTokenDocument, options);
+      }
+export type RefreshTokenMutationHookResult = ReturnType<typeof useRefreshTokenMutation>;
+export type RefreshTokenMutationResult = Apollo.MutationResult<RefreshTokenMutation>;
+export type RefreshTokenMutationOptions = Apollo.BaseMutationOptions<RefreshTokenMutation, RefreshTokenMutationVariables>;
+export const LogoutDocument = gql`
+    mutation Logout {
+  logout
+}
+    `;
+export type LogoutMutationFn = Apollo.MutationFunction<LogoutMutation, LogoutMutationVariables>;
+
+/**
+ * __useLogoutMutation__
+ *
+ * To run a mutation, you first call `useLogoutMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useLogoutMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [logoutMutation, { data, loading, error }] = useLogoutMutation({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useLogoutMutation(baseOptions?: Apollo.MutationHookOptions<LogoutMutation, LogoutMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<LogoutMutation, LogoutMutationVariables>(LogoutDocument, options);
+      }
+export type LogoutMutationHookResult = ReturnType<typeof useLogoutMutation>;
+export type LogoutMutationResult = Apollo.MutationResult<LogoutMutation>;
+export type LogoutMutationOptions = Apollo.BaseMutationOptions<LogoutMutation, LogoutMutationVariables>;
+export const PasswordRecoveryStepOneDocument = gql`
+    mutation PasswordRecoveryStepOne($email: String!, $countryCode: countryCodeEnum!) {
+  passwordRecoveryStepOne(email: $email, countryCode: $countryCode)
+}
+    `;
+export type PasswordRecoveryStepOneMutationFn = Apollo.MutationFunction<PasswordRecoveryStepOneMutation, PasswordRecoveryStepOneMutationVariables>;
+
+/**
+ * __usePasswordRecoveryStepOneMutation__
+ *
+ * To run a mutation, you first call `usePasswordRecoveryStepOneMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `usePasswordRecoveryStepOneMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [passwordRecoveryStepOneMutation, { data, loading, error }] = usePasswordRecoveryStepOneMutation({
+ *   variables: {
+ *      email: // value for 'email'
+ *      countryCode: // value for 'countryCode'
+ *   },
+ * });
+ */
+export function usePasswordRecoveryStepOneMutation(baseOptions?: Apollo.MutationHookOptions<PasswordRecoveryStepOneMutation, PasswordRecoveryStepOneMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<PasswordRecoveryStepOneMutation, PasswordRecoveryStepOneMutationVariables>(PasswordRecoveryStepOneDocument, options);
+      }
+export type PasswordRecoveryStepOneMutationHookResult = ReturnType<typeof usePasswordRecoveryStepOneMutation>;
+export type PasswordRecoveryStepOneMutationResult = Apollo.MutationResult<PasswordRecoveryStepOneMutation>;
+export type PasswordRecoveryStepOneMutationOptions = Apollo.BaseMutationOptions<PasswordRecoveryStepOneMutation, PasswordRecoveryStepOneMutationVariables>;
+export const PasswordRecoveryStepThreeDocument = gql`
+    mutation PasswordRecoveryStepThree($hash: String!, $password: String!) {
+  passwordRecoveryStepThree(hash: $hash, password: $password) {
+    id
+    email
+    token {
+      accessToken
+      refreshToken
+    }
+  }
+}
+    `;
+export type PasswordRecoveryStepThreeMutationFn = Apollo.MutationFunction<PasswordRecoveryStepThreeMutation, PasswordRecoveryStepThreeMutationVariables>;
+
+/**
+ * __usePasswordRecoveryStepThreeMutation__
+ *
+ * To run a mutation, you first call `usePasswordRecoveryStepThreeMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `usePasswordRecoveryStepThreeMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [passwordRecoveryStepThreeMutation, { data, loading, error }] = usePasswordRecoveryStepThreeMutation({
+ *   variables: {
+ *      hash: // value for 'hash'
+ *      password: // value for 'password'
+ *   },
+ * });
+ */
+export function usePasswordRecoveryStepThreeMutation(baseOptions?: Apollo.MutationHookOptions<PasswordRecoveryStepThreeMutation, PasswordRecoveryStepThreeMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<PasswordRecoveryStepThreeMutation, PasswordRecoveryStepThreeMutationVariables>(PasswordRecoveryStepThreeDocument, options);
+      }
+export type PasswordRecoveryStepThreeMutationHookResult = ReturnType<typeof usePasswordRecoveryStepThreeMutation>;
+export type PasswordRecoveryStepThreeMutationResult = Apollo.MutationResult<PasswordRecoveryStepThreeMutation>;
+export type PasswordRecoveryStepThreeMutationOptions = Apollo.BaseMutationOptions<PasswordRecoveryStepThreeMutation, PasswordRecoveryStepThreeMutationVariables>;
+export const CurrentUserDocument = gql`
+    query CurrentUser {
+  currentUser {
+    ...AuthUser
+  }
+}
+    ${AuthUserFragmentDoc}`;
+
+/**
+ * __useCurrentUserQuery__
+ *
+ * To run a query within a React component, call `useCurrentUserQuery` and pass it any options that fit your needs.
+ * When your component renders, `useCurrentUserQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useCurrentUserQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useCurrentUserQuery(baseOptions?: Apollo.QueryHookOptions<CurrentUserQuery, CurrentUserQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<CurrentUserQuery, CurrentUserQueryVariables>(CurrentUserDocument, options);
+      }
+export function useCurrentUserLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<CurrentUserQuery, CurrentUserQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<CurrentUserQuery, CurrentUserQueryVariables>(CurrentUserDocument, options);
+        }
+export type CurrentUserQueryHookResult = ReturnType<typeof useCurrentUserQuery>;
+export type CurrentUserLazyQueryHookResult = ReturnType<typeof useCurrentUserLazyQuery>;
+export type CurrentUserQueryResult = Apollo.QueryResult<CurrentUserQuery, CurrentUserQueryVariables>;
+export const PasswordRecoveryStepTwoDocument = gql`
+    query PasswordRecoveryStepTwo($hash: String!) {
+  passwordRecoveryStepTwo(hash: $hash)
+}
+    `;
+
+/**
+ * __usePasswordRecoveryStepTwoQuery__
+ *
+ * To run a query within a React component, call `usePasswordRecoveryStepTwoQuery` and pass it any options that fit your needs.
+ * When your component renders, `usePasswordRecoveryStepTwoQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = usePasswordRecoveryStepTwoQuery({
+ *   variables: {
+ *      hash: // value for 'hash'
+ *   },
+ * });
+ */
+export function usePasswordRecoveryStepTwoQuery(baseOptions: Apollo.QueryHookOptions<PasswordRecoveryStepTwoQuery, PasswordRecoveryStepTwoQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<PasswordRecoveryStepTwoQuery, PasswordRecoveryStepTwoQueryVariables>(PasswordRecoveryStepTwoDocument, options);
+      }
+export function usePasswordRecoveryStepTwoLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<PasswordRecoveryStepTwoQuery, PasswordRecoveryStepTwoQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<PasswordRecoveryStepTwoQuery, PasswordRecoveryStepTwoQueryVariables>(PasswordRecoveryStepTwoDocument, options);
+        }
+export type PasswordRecoveryStepTwoQueryHookResult = ReturnType<typeof usePasswordRecoveryStepTwoQuery>;
+export type PasswordRecoveryStepTwoLazyQueryHookResult = ReturnType<typeof usePasswordRecoveryStepTwoLazyQuery>;
+export type PasswordRecoveryStepTwoQueryResult = Apollo.QueryResult<PasswordRecoveryStepTwoQuery, PasswordRecoveryStepTwoQueryVariables>;
 export const DialTypesDocument = gql`
     query DialTypes {
   dialTypes {

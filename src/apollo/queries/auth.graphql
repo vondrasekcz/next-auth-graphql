@@ -1,0 +1,9 @@
+query CurrentUser { 
+    currentUser{
+    ...AuthUser
+  }
+}
+
+query PasswordRecoveryStepTwo ($hash: String!) {
+  passwordRecoveryStepTwo (hash: $hash)
+}
