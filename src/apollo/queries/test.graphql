@@ -1,5 +1,9 @@
-query DialTypes {
-  dialTypes {
+query Test(
+  $countryCode: countryCodeEnum!
+) {
+  brands(
+    countryCode: $countryCode
+  ) {
     key
     value
   }
