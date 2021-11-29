@@ -10,7 +10,7 @@ export const useLogout = () => {
 
   const handleCompleted = useCallback(
     () => {
-      setAccessToken('');
+      setAccessToken(null);
       apolloClient.resetStore();
     },
     [ apolloClient, ],

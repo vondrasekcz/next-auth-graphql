@@ -58,7 +58,10 @@ const createApolloClient = (
 };
 
 
-export const initApolloClient = (initState?: NormalizedCacheObject, serverAccessToken?: string | null): ApolloClient<NormalizedCacheObject> => {
+export const initApolloClient = (
+  initState?: NormalizedCacheObject,
+  serverAccessToken?: string | null
+): ApolloClient<NormalizedCacheObject> => {
   // Make sure to create a new client for every server-side request so that data
   // isn't shared between connections (which would be bad)
   if (isServer()) {
