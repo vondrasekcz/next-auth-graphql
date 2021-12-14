@@ -1,5 +1,6 @@
 import { CountryCodeEnum, useTestQuery, } from '@/apollo/graphql';
 import { getLayout, } from '@/components/Layout';
+import { withPrivatePage, } from '@/components/withPrivatePage';
 
 
 const PrivatePage = (): JSX.Element => {
@@ -44,4 +45,4 @@ const PrivatePage = (): JSX.Element => {
 PrivatePage.getLayout = getLayout;
 
 
-export default PrivatePage;
+export default withPrivatePage(PrivatePage);
