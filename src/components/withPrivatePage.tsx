@@ -1,14 +1,12 @@
 import Router from 'next/router';
 
-import type { PageComponentWithLayout, } from '@/types/common';
-import { getAccessToken } from '@/libs/accessTokenStore';
+import type { CustomPageContext, PageComponentWithLayout, } from '@/types/common';
+import { getAccessToken, } from '@/libs/accessTokenStore';
+import { CurrentUserDocument, } from '@/apollo/graphql';
+import { isServer, } from '@/utils/common';
 
 
 const loginPath = '/public';
-
-
-// TODO
-// - get user
 
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -16,10 +14,23 @@ export const withPrivatePage = (WrappedComponent: PageComponentWithLayout) => {
   const HOCComponent = ({ ...props }) => <WrappedComponent {...props} />;
 
   HOCComponent.getLayout = WrappedComponent?.getLayout || undefined;
-  HOCComponent.getInitialProps = async (context: any) => {
-    const isAuthenticated = !!getAccessToken();
+  HOCComponent.getInitialProps = async (context: CustomPageContext) => {
+    let isAuthenticated = false;
 
-    console.log('AT', isAuthenticated, getAccessToken())
+    // auth checker
+    try {
+      const accessToken = isServer() ? context?.serverAccessToken : getAccessToken();
+
+      if (accessToken) {
+        const authUser = await context.apolloClient.query({
+          query: CurrentUserDocument,
+          fetchPolicy: 'cache-only',
+        });
+        if (authUser) isAuthenticated = true;
+      }
+    } catch (error) {
+      // ignore error
+    }
 
     if (!isAuthenticated) {
       // server
@@ -33,11 +44,11 @@ export const withPrivatePage = (WrappedComponent: PageComponentWithLayout) => {
         Router.replace(loginPath);
       }
     } else if (WrappedComponent.getInitialProps) {
-      const wrappedProps = await WrappedComponent.getInitialProps({ ...context, isAuthenticated, });
-      return { ...wrappedProps, isAuthenticated, };
+      const wrappedProps = await WrappedComponent.getInitialProps({ ...context, });
+      return { ...wrappedProps, };
     }
 
-    return { isAuthenticated, };
+    return {};
   };
 
   return HOCComponent;
