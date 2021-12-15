@@ -20,6 +20,7 @@ import {
 import { isProduction, isServer, } from '@/utils/common';
 import { initApolloClient, } from './initApolloClient';
 import { getAccessToken, setAccessToken, } from '@/libs/accessTokenStore';
+import { CustomPageContext, } from '@/types/common';
 
 
 type WithApolloOptions = {
@@ -30,7 +31,7 @@ type WithApolloOptions = {
 
 type ContextWithApolloOptions =
   AppContext
-  & { ctx: { apolloClient: WithApolloOptions['apolloClient'] }, }
+  & { ctx: CustomPageContext, }
   & NextPageContext
   & WithApolloOptions;
 
@@ -49,17 +50,18 @@ export const withApollo = <P, IP>(
     serverAccessToken,
     ...pageProps
   }: any): JSX.Element => {
-    if (!isServer() && !getAccessToken) {
+    if (!isServer() && !getAccessToken()) {
       setAccessToken(serverAccessToken);
     }
+
     const client = apolloClient || initApolloClient(apolloState);
+
     return (
       <ApolloProvider client={client}>
         <PageComponent {...pageProps} apolloClient={client} />
       </ApolloProvider>
     );
   };
-
 
   if (!isProduction()) {
     console.warn(
@@ -129,8 +131,9 @@ export const withApollo = <P, IP>(
         }
       }
 
-      // set upt context apolloClient
+      // set upt context apolloClient + server token
       ctx.ctx.apolloClient = apolloClient;
+      ctx.ctx.serverAccessToken = serverAccessToken;
 
 
       // Run wrapped getInitialProps methods
@@ -187,7 +190,7 @@ export const withApollo = <P, IP>(
 
       // Extract query data from the Apollo store
       const apolloState = apolloClient.cache.extract();
-
+      console.log('serverAccessToken', serverAccessToken)
       return {
         ...pageProps,
         // Extract query data from the Apollo store
