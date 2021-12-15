@@ -1,6 +1,7 @@
 import { CountryCodeEnum, useTestQuery, } from '@/apollo/graphql';
 import { getLayout, } from '@/components/Layout';
 import { withPrivatePage, } from '@/components/withPrivatePage';
+import { isServer } from '@/utils/common';
 
 
 const PrivatePage = (): JSX.Element => {
@@ -10,7 +11,7 @@ const PrivatePage = (): JSX.Element => {
     },
   });
 
-  console.log(loading, error, data?.brands);
+  if (!isServer) console.log(loading, error, data?.brands);
 
   return (
     <div>

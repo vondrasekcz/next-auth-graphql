@@ -5,6 +5,6 @@ basic setup
 
 
 apollo next
-  https://github.com/benawad/jwt-auth-example/blob/nextjs-starter-code/web-nextjs/lib/apollo.tsx
+  https://github.com/benawad/jwt-auth-example/tree/nextjs-finished-code/web-nextjs
   https://github.com/adamsoffer/next-apollo/blob/master/src/withApollo.tsx
   https://www.apollographql.com/docs/react/performance/server-side-rendering/

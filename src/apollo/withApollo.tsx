@@ -49,7 +49,7 @@ export const withApollo = <P, IP>(
     serverAccessToken,
     ...pageProps
   }: any): JSX.Element => {
-    if (!isServer() && !getAccessToken) {
+    if (!isServer() && !getAccessToken()) {
       setAccessToken(serverAccessToken);
     }
     const client = apolloClient || initApolloClient(apolloState);
@@ -59,7 +59,7 @@ export const withApollo = <P, IP>(
       </ApolloProvider>
     );
   };
-
+  console.log('aaaa')
 
   if (!isProduction()) {
     console.warn(
@@ -187,7 +187,7 @@ export const withApollo = <P, IP>(
 
       // Extract query data from the Apollo store
       const apolloState = apolloClient.cache.extract();
-
+      console.log('serverAccessToken', serverAccessToken)
       return {
         ...pageProps,
         // Extract query data from the Apollo store

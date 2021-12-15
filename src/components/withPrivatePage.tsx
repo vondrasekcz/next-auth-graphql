@@ -1,22 +1,25 @@
 import Router from 'next/router';
 
 import type { PageComponentWithLayout, } from '@/types/common';
+import { getAccessToken } from '@/libs/accessTokenStore';
 
 
 const loginPath = '/public';
 
 
 // TODO
-// - types
 // - get user
 
 
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const withPrivatePage = (WrappedComponent: PageComponentWithLayout) => {
-  const hocComponent = ({ ...props }) => <WrappedComponent {...props} />;
+  const HOCComponent = ({ ...props }) => <WrappedComponent {...props} />;
 
-  hocComponent.getLayout = WrappedComponent?.getLayout || undefined;
-  hocComponent.getIintialProps = async (context: any) => {
-    const isAuthenticated = true;
+  HOCComponent.getLayout = WrappedComponent?.getLayout || undefined;
+  HOCComponent.getInitialProps = async (context: any) => {
+    const isAuthenticated = !!getAccessToken();
+
+    console.log('AT', isAuthenticated, getAccessToken())
 
     if (!isAuthenticated) {
       // server
@@ -37,5 +40,5 @@ export const withPrivatePage = (WrappedComponent: PageComponentWithLayout) => {
     return { isAuthenticated, };
   };
 
-  return hocComponent;
+  return HOCComponent;
 };
