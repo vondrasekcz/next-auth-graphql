@@ -190,7 +190,7 @@ export const withApollo = <P, IP>(
 
       // Extract query data from the Apollo store
       const apolloState = apolloClient.cache.extract();
-      console.log('serverAccessToken', serverAccessToken)
+
       return {
         ...pageProps,
         // Extract query data from the Apollo store
