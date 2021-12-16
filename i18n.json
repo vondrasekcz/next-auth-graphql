@@ -1,0 +1,10 @@
+{
+  "locales": ["cs", "de"],
+  "defaultLocale": "cs",
+  "pages": {
+    "*": ["common"],
+    "/": ["home"],
+    "/public": [],
+    "/private": []
+  }
+}
